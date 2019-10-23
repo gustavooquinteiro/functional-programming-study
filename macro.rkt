@@ -697,3 +697,26 @@
                                ""
                                (map coloque-maiuscula
                                     (cdr str-list))))]))
+
+; BOTA COMO CASE------------------------
+(define-syntax (define-hifenizado stx)
+                 (syntax-case stx()
+                   [( _ nomes ... (args ...) corpo)
+                    (with-syntax
+                        ([nome (datum->syntax stx
+                                             (string->symbol
+                                              (string-append (symbol->string (car (syntax->datum #'(nomes ...))))
+                                               (transforma-hifen
+                                                (map symbol->string
+                                                      (cdr (syntax->datum #'(nomes ...))))))))])
+                      #'(define (nome args ...) corpo))]))
+
+
+
+
+(define-for-syntax (transforma-hifen l)
+  (cond
+    [(null? (cdr l)) (string-append (string-upcase (substring (car l) 0 1)) (substring (car l) 1))]
+    [else (string-append (string-append (string-upcase (substring (car l) 0 1)) (substring (car l) 1)) (transforma-hifen (cdr l)))])) 
+
+                                    
