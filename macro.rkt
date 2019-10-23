@@ -719,4 +719,22 @@
     [(null? (cdr l)) (string-append (string-upcase (substring (car l) 0 1)) (substring (car l) 1))]
     [else (string-append (string-append (string-upcase (substring (car l) 0 1)) (substring (car l) 1)) (transforma-hifen (cdr l)))])) 
 
+(define-syntax (define-hifenizado stx)
+                 (syntax-case stx()
+                   [( _ nomes ... (args ...) corpo)
+                    (with-syntax
+                        ([nome (datum->syntax stx
+                                             (string->symbol
+                                               (transforma-hifen
+                                                (map symbol->string
+                                                     (syntax->datum  #'(nomes ...))))))])
+                      #'(define (nome args ...) corpo))]))
+
+
+
+
+(define-for-syntax (transforma-hifen l)
+  (cond
+    [(null? (cdr l)) (car l)]
+    [else (string-append (car l) "-" (transforma-hifen (cdr l)))])) 
                                     
